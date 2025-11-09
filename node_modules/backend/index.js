@@ -10,29 +10,36 @@ import { app, server } from "./socket/socket.js";
 dotenv.config();
 const PORT = process.env.PORT || 8080;
 
-// ✅ CORS before all routes
+const allowedOrigins = [
+  process.env.FRONTEND_BASE_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
-    credentials: true, // ✅ allows cookies
+    origin: allowedOrigins,
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
-// ✅ Now middleware
+
+// ✅ Middlewares
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Debug log
-console.log("🌐 CORS Enabled for: http://localhost:5173 & 3000");
+console.log("🌐 CORS Enabled for:", allowedOrigins);
 
 // ✅ Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/message", messageRoute);
 
+// ✅ Root endpoint
 app.get("/", (req, res) => res.send("✅ API is running successfully..."));
 
+// ✅ Start server
 server.listen(PORT, async () => {
   await connectDB();
   console.log(`🚀 Server running on http://localhost:${PORT}`);
