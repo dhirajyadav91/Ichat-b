@@ -10,19 +10,24 @@ import { app, server } from "./socket/socket.js";
 dotenv.config();
 const PORT = process.env.PORT || 8080;
 
-const allowedOrigins = [
-  process.env.FRONTEND_BASE_URL,
-  "http://localhost:5173",
-  "http://localhost:3000",
-].filter(Boolean);
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+const allowedOrigins = [
+  "https://ichat-f.onrender.com",
+  "http://localhost:5173"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true,
+}));
+
 
 
 // ✅ Middlewares
